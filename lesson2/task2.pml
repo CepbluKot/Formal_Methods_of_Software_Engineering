@@ -14,7 +14,7 @@ active proctype A() {
 }
 
 ltl p1 { x == 0 }
-
+    
 ltl p2 { x != 0 }
 
 ltl p3 { (x == 0) -> X (x != 0) }

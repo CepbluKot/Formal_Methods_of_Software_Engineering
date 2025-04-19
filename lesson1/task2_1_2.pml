@@ -50,4 +50,27 @@ active proctype ARRAY() {
 	od;
 	
 	printf("Result = %d\n",result);
+
+
+	int even = 0;
+    int odd = 0;
+    i = 0;
+    do
+    :: (i >= N) -> break
+    :: else ->
+         if
+         :: ((i % 2) == 0) -> even = even + a[i]
+         :: else           -> odd  = odd  + a[i]
+         fi;
+         printf("[calc] element id %d a[%d] = %d\n", i, i, a[i]);
+         printf("[calc] even sum = %d, odd sum = %d\n", even, odd);
+         i = i + 1
+    od;
+    
+    int result = even - odd;
+    printf("Total result (even - odd) = %d\n", result);
+    
+    /* В случае интерактивного моделирования можно добавить условие,
+       чтобы итоговый результат был равен 1 */
+    assert(result == 1)
 }

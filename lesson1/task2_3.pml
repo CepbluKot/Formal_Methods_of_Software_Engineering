@@ -50,4 +50,8 @@ active proctype ARRAY() {
     printf("Result = %d\n", result);
     
     assert(result == 1);
+
+
+
+
 }
