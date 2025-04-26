@@ -1,4 +1,4 @@
-#define TARGET_LEN 13
+byte TARGET_LEN = 13
 
 bool matched = false;
 byte pos;
