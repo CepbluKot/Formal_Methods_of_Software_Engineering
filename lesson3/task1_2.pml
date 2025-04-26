@@ -10,8 +10,8 @@ byte target[TARGET_LEN] = {
 
 proctype Monkey(byte c) {
     do
-    :: matched        -> break;   /* если уже найдено — выходим */
-    :: !matched       -> ch!c;    /* иначе шлём букву */
+    :: matched        -> break;
+    :: !matched       -> ch!c;
     od;
 }
 
