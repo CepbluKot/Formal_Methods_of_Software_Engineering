@@ -165,34 +165,34 @@ init {
 // Безопасность - нет пересечений между:
 
 /* 1: S->N  ∧ (E->W, E->S, W->E) */
-ltl s1 { [] ! (statuses[0] && (statuses[1] || statuses[3] || statuses[4])) }
+ltl s1 { [] ! (statuses[SN_ROAD_ID-1] && (statuses[EW_ROAD_ID-1] || statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
 /* 2: E->W  ∧ (Ped, S->N) */
-ltl s2 { [] ! (statuses[1] && (statuses[5] || statuses[0])) }
+ltl s2 { [] ! (statuses[EW_ROAD_ID-1] && (statuses[PED_ROAD_ID-1] || statuses[SN_ROAD_ID-1])) }
 /* 3: S->W  ∧ (E->S, W->E) */
-ltl s3 { [] ! (statuses[2] && (statuses[3] || statuses[4])) }
+ltl s3 { [] ! (statuses[SW_ROAD_ID-1] && (statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
 /* 4: E->S  ∧ (Ped, S->N, S->W, W->E) */
-ltl s4 { [] ! (statuses[3] && (statuses[5] || statuses[0] || statuses[2] || statuses[4])) }
+ltl s4 { [] ! (statuses[ES_ROAD_ID-1] && (statuses[PED_ROAD_ID-1] || statuses[SN_ROAD_ID-1] || statuses[SW_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
 /* 5: W->E  ∧ (E->S, S->W, S->N, Ped) */
-ltl s5 { [] ! (statuses[4] && (statuses[3] || statuses[2] || statuses[0] || statuses[5])) }
+ltl s5 { [] ! (statuses[WE_ROAD_ID-1] && (statuses[ES_ROAD_ID-1] || statuses[SW_ROAD_ID-1] || statuses[SN_ROAD_ID-1] || statuses[PED_ROAD_ID-1])) }
 /* 6: Ped   ∧ (E->W, E->S, W->E) */
-ltl s6 { [] ! (statuses[5] && (statuses[1] || statuses[3] || statuses[4])) }
+ltl s6 { [] ! (statuses[PED_ROAD_ID-1] && (statuses[EW_ROAD_ID-1] || statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
 
 
 
 
 /* === LTL-живость === */
-ltl l1 { []( (queue[0] == 1 && statuses[0]==false) -> <> (statuses[0]==true) ) }
-ltl l2 { []( (queue[1] == 1 && statuses[1]==false) -> <> (statuses[1]==true) ) }
-ltl l3 { []( (queue[2] == 1 && statuses[2]==false) -> <> (statuses[2]==true) ) }
-ltl l4 { []( (queue[3] == 1 && statuses[3]==false) -> <> (statuses[3]==true) ) }
-ltl l5 { []( (queue[4] == 1 && statuses[4]==false) -> <> (statuses[4]==true) ) }
-ltl l6 { []( (queue[5] == 1 && statuses[5]==false) -> <> (statuses[5]==true) ) }
+ltl l1 { []( (queue[SN_ROAD_ID-1] == 1 && statuses[SN_ROAD_ID-1]==false) -> <> (statuses[SN_ROAD_ID-1]==true) ) }
+ltl l2 { []( (queue[EW_ROAD_ID-1] == 1 && statuses[EW_ROAD_ID-1]==false) -> <> (statuses[EW_ROAD_ID-1]==true) ) }
+ltl l3 { []( (queue[SW_ROAD_ID-1] == 1 && statuses[SW_ROAD_ID-1]==false) -> <> (statuses[SW_ROAD_ID-1]==true) ) }
+ltl l4 { []( (queue[ES_ROAD_ID-1] == 1 && statuses[ES_ROAD_ID-1]==false) -> <> (statuses[ES_ROAD_ID-1]==true) ) }
+ltl l5 { []( (queue[WE_ROAD_ID-1] == 1 && statuses[WE_ROAD_ID-1]==false) -> <> (statuses[WE_ROAD_ID-1]==true) ) }
+ltl l6 { []( (queue[PED_ROAD_ID-1] == 1 && statuses[PED_ROAD_ID-1]==false) -> <> (statuses[PED_ROAD_ID-1]==true) ) }
 
 /* === LTL-честность === */
-ltl f1 { []( <> (statuses[0] == false) ) }
-ltl f2 { []( <> (statuses[1] == false) ) }
-ltl f3 { []( <> (statuses[2] == false) ) }
-ltl f4 { []( <> (statuses[3] == false) ) }
-ltl f5 { []( <> (statuses[4] == false) ) }
-ltl f6 { []( <> (statuses[5] == false) ) }
+ltl f1 { []( <> (statuses[SN_ROAD_ID-1] == false) ) }
+ltl f2 { []( <> (statuses[EW_ROAD_ID-1] == false) ) }
+ltl f3 { []( <> (statuses[SW_ROAD_ID-1] == false) ) }
+ltl f4 { []( <> (statuses[ES_ROAD_ID-1] == false) ) }
+ltl f5 { []( <> (statuses[WE_ROAD_ID-1] == false) ) }
+ltl f6 { []( <> (statuses[PED_ROAD_ID-1] == false) ) }
 // Одновременный проезд 
