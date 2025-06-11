@@ -1,10 +1,10 @@
 
-chan TL1 = [1] of {byte};
-chan TL2 = [1] of {byte};
-chan TL3 = [1] of {byte};
-chan TL4 = [1] of {byte};
-chan TL5 = [1] of {byte};
-chan TL6 = [1] of {byte};
+chan SN_LIGHT_CHANNEL = [1] of {byte};
+chan EW_LIGHT_CHANNEL = [1] of {byte};
+chan SW_LIGHT_CHANNEL = [1] of {byte};
+chan ES_LIGHT_CHANNEL = [1] of {byte};
+chan WE_LIGHT_CHANNEL = [1] of {byte};
+chan PED_LIGHT_CHANNEL = [1] of {byte};
 
 
 byte n = 10;
@@ -15,109 +15,109 @@ short requests [7]  = {0,0,0,0,0,0};
 bool statuses [6]  = {false, false, false, false, false, false};
 
 
-proctype TrafficLight (byte number; byte nextNum; byte fProblem; byte sProblem; byte tProblem; byte uProblem; chan tlChan){
-    short fValue=0;
-    short sValue=0;
-    short tValue=0;
-    short nValue = 0;
-    short uValue = 0;
+proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; byte competitor_2; byte competitor_3; byte competitor_4; chan traffic_channel){
+    short competitor_1_value=0;
+    short competitor_2_value=0;
+    short competitor_3_value=0;
+    short competitor_4_value = 0;
+    short curr_road_value = 0;
 
     byte temp = 0;
     do
-        ::  currentTurn == number  ->
+        ::  currentTurn == curr_road_id  ->
         if
         // Есть трафик для этого светофора
-        ::    tlChan?temp->
+        ::    traffic_channel?temp->
         
                 requests[0] = 0; 
-                queue[number-1] = temp; 
+                queue[curr_road_id-1] = temp; 
                  atomic {  
                 printf("\n\n");      
-                printf("Proc :%d\n", number);
-                printf("Is green = %d\n", statuses[number-1]);
-                printf("Cars? %d\n", queue[number-1]);
-                printf("Request: %d\n", requests[number]);
+                printf("Proc :%d\n", curr_road_id);
+                printf("Is green = %d\n", statuses[curr_road_id-1]);
+                printf("Cars? %d\n", queue[curr_road_id-1]);
+                printf("Request: %d\n", requests[curr_road_id]);
                  }
 
                 if
-                    :: statuses[number-1] == true ->
-                           requests [number] =0; 
-                           statuses[number-1] = false;
-                           printf ("Set color as red at %d\n", number);
-                           printf("And now its request is: %d\n", requests[number]);
+                    :: statuses[curr_road_id-1] == true ->
+                           requests [curr_road_id] =0; 
+                           statuses[curr_road_id-1] = false;
+                           printf ("Set color as red at %d\n", curr_road_id);
+                           printf("And now its request is: %d\n", requests[curr_road_id]);
                     :: else -> skip;
                 fi;
                 
                 if
-                :: requests[number] > 0  ->
+                :: requests[curr_road_id] > 0  ->
                         if
-                        :: (requests[fProblem] == 0  ) && 
-                            (requests[sProblem] == 0 ) && 
-                            (requests[tProblem] == 0  ) &&
-                            (requests[uProblem] == 0  )
+                        :: (requests[competitor_1] == 0  ) && 
+                            (requests[competitor_2] == 0 ) && 
+                            (requests[competitor_3] == 0  ) &&
+                            (requests[competitor_4] == 0  )
                             ->
-                                statuses[number-1] = true;
-                                queue[number-1] = 0;
-                                printf ("Set color as green (no enemies) at %d\n", number);
-                                currentTurn = nextNum
+                                statuses[curr_road_id-1] = true;
+                                queue[curr_road_id-1] = 0;
+                                printf ("Set color as green (no enemies) at %d\n", curr_road_id);
+                                currentTurn = next_road_id
 
                         :: else ->
                                 if // Первый соперник
-                                    :: requests[fProblem] > 0 -> fValue = requests[fProblem];
-                                    :: else -> fValue = 0;
+                                    :: requests[competitor_1] > 0 -> competitor_1_value = requests[competitor_1];
+                                    :: else -> competitor_1_value = 0;
                                 fi;
                                 if // Второй соперник
-                                    :: requests[sProblem] >0 -> sValue = requests[sProblem];
-                                    :: else -> sValue = 0;
+                                    :: requests[competitor_2] >0 -> competitor_2_value = requests[competitor_2];
+                                    :: else -> competitor_2_value = 0;
                                 fi;
                                 if // Третий соперник
-                                    :: requests[tProblem] >0 -> tValue = requests[tProblem];
-                                    :: else -> tValue = 0;
+                                    :: requests[competitor_3] >0 -> competitor_3_value = requests[competitor_3];
+                                    :: else -> competitor_3_value = 0;
                                 fi
                                 if // 4 соперник
-                                    :: requests[uProblem] >0 -> uValue = requests[uProblem];
-                                    :: else -> uValue = 0;
+                                    :: requests[competitor_4] >0 -> competitor_4_value = requests[competitor_4];
+                                    :: else -> competitor_4_value = 0;
                                 fi
 
-                                nValue = requests[number];
+                                curr_road_value = requests[curr_road_id];
                                 atomic {
 
-                                printf("(%d) enemies are: %d,%d,%d\n", number, fProblem, sProblem, tProblem, uProblem);
-                                printf("And values for #%d : (%d) and for enemies are: %d,%d,%d\n", number, nValue, fValue, sValue, tValue, uValue);
+                                printf("(%d) enemies are: %d,%d,%d\n", curr_road_id, competitor_1, competitor_2, competitor_3, competitor_4);
+                                printf("And values for #%d : (%d) and for enemies are: %d,%d,%d\n", curr_road_id, curr_road_value, competitor_1_value, competitor_2_value, competitor_3_value, competitor_4_value);
                                 }
 
                                 if 
-                                            :: fValue > nValue || sValue > nValue || tValue > nValue ->
-                                                    requests[number] =  nValue + n; 
-                                                    requests[fProblem] = fValue + n;
-                                                    requests[sProblem] = sValue + n;
-                                                    requests[tProblem] = tValue + n;
-                                                    requests[uProblem] = uValue + n;
+                                            :: competitor_1_value > curr_road_value || competitor_2_value > curr_road_value || competitor_3_value > curr_road_value ->
+                                                    requests[curr_road_id] =  curr_road_value + n; 
+                                                    requests[competitor_1] = competitor_1_value + n;
+                                                    requests[competitor_2] = competitor_2_value + n;
+                                                    requests[competitor_3] = competitor_3_value + n;
+                                                    requests[competitor_4] = competitor_4_value + n;
                                                     
-                                                    printf ("(%d) will wait for enemies \n", number);
-                                                    printf("(%d) new value is (%d) and for enemies: %d,%d,%d\n",  number, requests[number], requests[fProblem], requests[sProblem], requests[tProblem], requests[uProblem]);
+                                                    printf ("(%d) will wait for enemies \n", curr_road_id);
+                                                    printf("(%d) new value is (%d) and for enemies: %d,%d,%d\n",  curr_road_id, requests[curr_road_id], requests[competitor_1], requests[competitor_2], requests[competitor_3], requests[competitor_4]);
                                                     skip
                                             :: else ->
-                                                 printf ("Set color as green as (%d) was MAX \n", number);
-                                                 statuses[number-1] = true;
-                                                 queue[number-1] = 0;
-                                                 requests[number] = 999 + number
+                                                 printf ("Set color as green as (%d) was MAX \n", curr_road_id);
+                                                 statuses[curr_road_id-1] = true;
+                                                 queue[curr_road_id-1] = 0;
+                                                 requests[curr_road_id] = 999 + curr_road_id
 
-                                 fi;
+                                fi;
                         atomic{
                         printf("Requests are 1 (%d), 2 (%d), 3 (%d), 4 (%d), 5 (%d), 6 (%d)\n", requests[1],requests[2],requests[3],requests[4],requests[5],requests[6]);
                         printf("Statuses are 1 (%d), 2 (%d), 3 (%d), 4 (%d), 5 (%d), 6 (%d)\n", statuses[0],statuses[1],statuses[2],statuses[3],statuses[4],statuses[5]);
                         printf("Cars waiting at 1 (%d), 2 (%d), 3 (%d), 4 (%d), 5 (%d), 6 (%d)\n", queue[0],queue[1],queue[2],queue[3],queue[4],queue[5]);
                         }
-                        currentTurn = nextNum;
+                        currentTurn = next_road_id;
                         requests[0] = 0;
 
 
                         fi
 
                 :: else ->
-                        requests[number] = number;
-                        currentTurn = nextNum;
+                        requests[curr_road_id] = curr_road_id;
+                        currentTurn = next_road_id;
                 fi;
             fi;
     od
@@ -125,26 +125,26 @@ proctype TrafficLight (byte number; byte nextNum; byte fProblem; byte sProblem; 
 
 proctype TrafficGenerator(){
     do
-        :: TL1!1
-        :: TL2!1
-        :: TL3!1
-        :: TL4!1
-        :: TL5!1
-        :: TL6!1
+        :: SN_LIGHT_CHANNEL!1
+        :: EW_LIGHT_CHANNEL!1
+        :: SW_LIGHT_CHANNEL!1
+        :: ES_LIGHT_CHANNEL!1
+        :: WE_LIGHT_CHANNEL!1
+        :: PED_LIGHT_CHANNEL!1
     od
 }
 
 
 init {
-    /* number, nextNum, fProblem, sProblem, tProblem, uProblem */
+    /* curr_road_id, next_road_id, competitor_1, competitor_2, competitor_3, competitor_4 */
     /* (1=S→N, 2=E→W, 3=S→W, 4=E→S, 5=W→E, 6=Ped). */
 
-    run TrafficLight(1, 2, 2,4,5, 0, TL1); /* S->N  ↔ E->W(2), E->S(4), W->E(5) */
-    run TrafficLight(2, 3, 6,1,0, 0, TL2); /* E->W  ↔ Ped(6), S->N(1) */
-    run TrafficLight(3, 4, 4,5,0, 0, TL3); /* S->W  ↔ E->S(4), W->E(5) */
-    run TrafficLight(4, 5, 6,1,3, 5, TL4); /* E->S  ↔ Ped(6), S->N(1), S->W(3), W->E(5) */
-    run TrafficLight(5, 6, 4,3,1, 6, TL5); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
-    run TrafficLight(6, 1, 2,4,5, 0, TL6); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(1, 2, 2,4,5, 0, SN_LIGHT_CHANNEL); /* S->N  ↔ E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(2, 3, 6,1,0, 0, EW_LIGHT_CHANNEL); /* E->W  ↔ Ped(6), S->N(1) */
+    run TrafficLight(3, 4, 4,5,0, 0, SW_LIGHT_CHANNEL); /* S->W  ↔ E->S(4), W->E(5) */
+    run TrafficLight(4, 5, 6,1,3, 5, ES_LIGHT_CHANNEL); /* E->S  ↔ Ped(6), S->N(1), S->W(3), W->E(5) */
+    run TrafficLight(5, 6, 4,3,1, 6, WE_LIGHT_CHANNEL); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
+    run TrafficLight(6, 1, 2,4,5, 0, PED_LIGHT_CHANNEL); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
 
     run TrafficGenerator();
 }
