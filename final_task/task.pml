@@ -1,3 +1,15 @@
+// Черное
+#define SN_ROAD_ID 1
+// Фиолетовое
+#define EW_ROAD_ID 2
+// Синее
+#define SW_ROAD_ID 3
+// Оранжевое
+#define ES_ROAD_ID 4
+// Красное
+#define WE_ROAD_ID 5
+// Пешеходы
+#define PED_ROAD_ID 6
 
 chan SN_LIGHT_CHANNEL = [1] of {byte};
 chan EW_LIGHT_CHANNEL = [1] of {byte};
@@ -139,12 +151,12 @@ init {
     /* curr_road_id, next_road_id, competitor_1, competitor_2, competitor_3, competitor_4 */
     /* (1=S→N, 2=E→W, 3=S→W, 4=E→S, 5=W→E, 6=Ped). */
 
-    run TrafficLight(1, 2, 2,4,5, 0, SN_LIGHT_CHANNEL); /* S->N  ↔ E->W(2), E->S(4), W->E(5) */
-    run TrafficLight(2, 3, 6,1,0, 0, EW_LIGHT_CHANNEL); /* E->W  ↔ Ped(6), S->N(1) */
-    run TrafficLight(3, 4, 4,5,0, 0, SW_LIGHT_CHANNEL); /* S->W  ↔ E->S(4), W->E(5) */
-    run TrafficLight(4, 5, 6,1,3, 5, ES_LIGHT_CHANNEL); /* E->S  ↔ Ped(6), S->N(1), S->W(3), W->E(5) */
-    run TrafficLight(5, 6, 4,3,1, 6, WE_LIGHT_CHANNEL); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
-    run TrafficLight(6, 1, 2,4,5, 0, PED_LIGHT_CHANNEL); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(SN_ROAD_ID, EW_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, SN_LIGHT_CHANNEL); /* S->N  ↔ E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(EW_ROAD_ID, SW_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, 0, 0, EW_LIGHT_CHANNEL); /* E->W  ↔ Ped(6), S->N(1) */
+    run TrafficLight(SW_ROAD_ID, ES_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, 0, SW_LIGHT_CHANNEL); /* S->W  ↔ E->S(4), W->E(5) */
+    run TrafficLight(ES_ROAD_ID, WE_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, SW_ROAD_ID, WE_ROAD_ID, ES_LIGHT_CHANNEL); /* E->S  ↔ Ped(6), S->N(1), S->W(3), W->E(5) */
+    run TrafficLight(WE_ROAD_ID, PED_ROAD_ID, ES_ROAD_ID, SW_ROAD_ID, SN_ROAD_ID, PED_ROAD_ID, WE_LIGHT_CHANNEL); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
+    run TrafficLight(PED_ROAD_ID, SN_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, PED_LIGHT_CHANNEL); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
 
     run TrafficGenerator();
 }
