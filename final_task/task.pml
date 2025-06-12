@@ -16,11 +16,13 @@ chan PED_LIGHT_CHANNEL = [1] of {byte};
 
 byte n = 10;
 
-byte currentTurn = 1;
-byte queue [6] = {0,0,0,0,0,0};
-short requests [7] = {0,0,0,0,0,0};
-bool statuses [6] = {false, false, false, false, false, false};
 
+short n_requests_per_road [7] = {0,0,0,0,0,0};
+byte road_sensor_state [6] = {0,0,0,0,0,0};
+bool traffic_lights_states [6] = {false, false, false, false, false, false};
+
+
+byte current_processed_road_id = 1;
 
 proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; byte competitor_2; byte competitor_3; byte competitor_4; chan traffic_channel){
     short curr_road_value = 0;
@@ -30,101 +32,101 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
     short competitor_4_value = 0;
     byte temp = 0;
     do
-        :: currentTurn == curr_road_id ->
+        :: current_processed_road_id == curr_road_id ->
         if
         // Есть трафик для этого светофора
         :: traffic_channel?temp->
-                requests[0] = 0; 
-                queue[curr_road_id-1] = temp;
+                n_requests_per_road[0] = 0; 
+                road_sensor_state[curr_road_id-1] = temp;
 
                 atomic {
                     printf("\n\n\nProcess for road id: %d", curr_road_id);
-                    printf("\nN of requests: %d", requests[curr_road_id]);
-                    printf("\nCar sensor state: %d", queue[curr_road_id-1]);
-                    printf("\nTraffic Light opened: %d", statuses[curr_road_id-1]);
+                    printf("\nN of n_requests_per_road: %d", n_requests_per_road[curr_road_id]);
+                    printf("\nCar sensor state: %d", road_sensor_state[curr_road_id-1]);
+                    printf("\nTraffic Light opened: %d", traffic_lights_states[curr_road_id-1]);
                 }
 
                 if
-                    :: statuses[curr_road_id-1] == true ->
-                        requests[curr_road_id] = 0; 
-                        statuses[curr_road_id-1] = false;
+                    :: traffic_lights_states[curr_road_id-1] == true ->
+                        n_requests_per_road[curr_road_id] = 0; 
+                        traffic_lights_states[curr_road_id-1] = false;
                         printf ("\n\n\nClose traffic light for road_id: %d", curr_road_id);
-                        printf("\nN requests for this road_id: %d", requests[curr_road_id]);
+                        printf("\nN n_requests_per_road for this road_id: %d", n_requests_per_road[curr_road_id]);
                     :: else -> skip;
                 fi;
                 
                 if
-                :: requests[curr_road_id] > 0 ->
-                        printf("\n\n\nAvailable requests for road_id: %d", curr_road_id)
+                :: n_requests_per_road[curr_road_id] > 0 ->
+                        printf("\n\n\nAvailable n_requests_per_road for road_id: %d", curr_road_id)
                         if
-                        :: (requests[competitor_1] == 0) && 
-                            (requests[competitor_2] == 0) && 
-                            (requests[competitor_3] == 0) &&
-                            (requests[competitor_4] == 0)
+                        :: (n_requests_per_road[competitor_1] == 0) && 
+                            (n_requests_per_road[competitor_2] == 0) && 
+                            (n_requests_per_road[competitor_3] == 0) &&
+                            (n_requests_per_road[competitor_4] == 0)
                             ->
                                 printf("\n\n\nOpen traffic light for road_id: %d", curr_road_id);
-                                statuses[curr_road_id-1] = true;
-                                queue[curr_road_id-1] = 0;
-                                currentTurn = next_road_id
+                                traffic_lights_states[curr_road_id-1] = true;
+                                road_sensor_state[curr_road_id-1] = 0;
+                                current_processed_road_id = next_road_id
                         :: else ->
                                 printf("\n\n\nFailed to open traffic light for road_id: %d", curr_road_id);
                                 if
-                                    :: requests[competitor_1] > 0 -> competitor_1_value = requests[competitor_1];
+                                    :: n_requests_per_road[competitor_1] > 0 -> competitor_1_value = n_requests_per_road[competitor_1];
                                     :: else -> competitor_1_value = 0;
                                 fi;
                                 if
-                                    :: requests[competitor_2] >0 -> competitor_2_value = requests[competitor_2];
+                                    :: n_requests_per_road[competitor_2] >0 -> competitor_2_value = n_requests_per_road[competitor_2];
                                     :: else -> competitor_2_value = 0;
                                 fi;
                                 if
-                                    :: requests[competitor_3] >0 -> competitor_3_value = requests[competitor_3];
+                                    :: n_requests_per_road[competitor_3] >0 -> competitor_3_value = n_requests_per_road[competitor_3];
                                     :: else -> competitor_3_value = 0;
                                 fi
                                 if
-                                    :: requests[competitor_4] >0 -> competitor_4_value = requests[competitor_4];
+                                    :: n_requests_per_road[competitor_4] >0 -> competitor_4_value = n_requests_per_road[competitor_4];
                                     :: else -> competitor_4_value = 0;
                                 fi
 
-                                curr_road_value = requests[curr_road_id];
+                                curr_road_value = n_requests_per_road[curr_road_id];
                                 
                                 atomic {
-                                    printf("\n\n\n --- N requests status (BEFORE CHECK) --- ")
+                                    printf("\n\n\n --- N n_requests_per_road status (BEFORE CHECK) --- ")
             
-                                    printf("\n\nN requests for curr road_id %d: %d \nN requests for competitor_1 road_id %d: %d \nN requests for competitor_2 road_id %d: %d \nN requests for competitor_3 road_id %d: %d \nN requests for competitor_4 road_id %d: %d", curr_road_id, curr_road_value, competitor_1, competitor_1_value, competitor_2, competitor_2_value, competitor_3, competitor_3_value, competitor_4, competitor_4_value);
+                                    printf("\n\nN n_requests_per_road for curr road_id %d: %d \nN n_requests_per_road for competitor_1 road_id %d: %d \nN n_requests_per_road for competitor_2 road_id %d: %d \nN n_requests_per_road for competitor_3 road_id %d: %d \nN n_requests_per_road for competitor_4 road_id %d: %d", curr_road_id, curr_road_value, competitor_1, competitor_1_value, competitor_2, competitor_2_value, competitor_3, competitor_3_value, competitor_4, competitor_4_value);
                                 }
 
                                 if 
                                     :: competitor_1_value > curr_road_value || competitor_2_value > curr_road_value || competitor_3_value > curr_road_value ->
-                                        requests[curr_road_id] = curr_road_value + n; 
-                                        requests[competitor_1] = competitor_1_value + n;
-                                        requests[competitor_2] = competitor_2_value + n;
-                                        requests[competitor_3] = competitor_3_value + n;
-                                        requests[competitor_4] = competitor_4_value + n;
+                                        n_requests_per_road[curr_road_id] = curr_road_value + n; 
+                                        n_requests_per_road[competitor_1] = competitor_1_value + n;
+                                        n_requests_per_road[competitor_2] = competitor_2_value + n;
+                                        n_requests_per_road[competitor_3] = competitor_3_value + n;
+                                        n_requests_per_road[competitor_4] = competitor_4_value + n;
                                         
-                                        printf("\n\n\n --- N requests status (AFTER CHECK, FAILED TO OPEN TRAFFIC LIGHT) --- ")
-                                        printf("\n\nN requests for curr road_id %d: %d \nN requests for competitor_1 road_id %d: %d \nN requests for competitor_2 road_id %d: %d \nN requests for competitor_3 road_id %d: %d \nN requests for competitor_4 road_id %d: %d", curr_road_id, requests[curr_road_id], competitor_1, requests[competitor_1], competitor_2, requests[competitor_2], competitor_3, requests[competitor_3], competitor_4, requests[competitor_4]);
+                                        printf("\n\n\n --- N n_requests_per_road status (AFTER CHECK, FAILED TO OPEN TRAFFIC LIGHT) --- ")
+                                        printf("\n\nN n_requests_per_road for curr road_id %d: %d \nN n_requests_per_road for competitor_1 road_id %d: %d \nN n_requests_per_road for competitor_2 road_id %d: %d \nN n_requests_per_road for competitor_3 road_id %d: %d \nN n_requests_per_road for competitor_4 road_id %d: %d", curr_road_id, n_requests_per_road[curr_road_id], competitor_1, n_requests_per_road[competitor_1], competitor_2, n_requests_per_road[competitor_2], competitor_3, n_requests_per_road[competitor_3], competitor_4, n_requests_per_road[competitor_4]);
                                         skip
                                     :: else ->
-                                        printf("\n\n\n --- N requests status (AFTER CHECK, SUCCEEDED TO OPEN TRAFFIC LIGHT) --- ")
-                                        printf("\n\nN requests for curr road_id %d: %d \nN requests for competitor_1 road_id %d: %d \nN requests for competitor_2 road_id %d: %d \nN requests for competitor_3 road_id %d: %d \nN requests for competitor_4 road_id %d: %d", curr_road_id, requests[curr_road_id], competitor_1, requests[competitor_1], competitor_2, requests[competitor_2], competitor_3, requests[competitor_3], competitor_4, requests[competitor_4]);
-                                        statuses[curr_road_id-1] = true;
-                                        queue[curr_road_id-1] = 0;
-                                        requests[curr_road_id] = 999 + curr_road_id
+                                        printf("\n\n\n --- N n_requests_per_road status (AFTER CHECK, SUCCEEDED TO OPEN TRAFFIC LIGHT) --- ")
+                                        printf("\n\nN n_requests_per_road for curr road_id %d: %d \nN n_requests_per_road for competitor_1 road_id %d: %d \nN n_requests_per_road for competitor_2 road_id %d: %d \nN n_requests_per_road for competitor_3 road_id %d: %d \nN n_requests_per_road for competitor_4 road_id %d: %d", curr_road_id, n_requests_per_road[curr_road_id], competitor_1, n_requests_per_road[competitor_1], competitor_2, n_requests_per_road[competitor_2], competitor_3, n_requests_per_road[competitor_3], competitor_4, n_requests_per_road[competitor_4]);
+                                        traffic_lights_states[curr_road_id-1] = true;
+                                        road_sensor_state[curr_road_id-1] = 0;
+                                        n_requests_per_road[curr_road_id] = 999 + curr_road_id
                                 fi;
                         
-                        currentTurn = next_road_id;
-                        requests[0] = 0;
-                        atomic{
-                            printf("\n\n\n --- Global status --- ")
-                            printf("\n\nN requests for road_id 1: %d \nN requests for road_id 2: %d \nN requests for road_id 3: %d \nN requests for road_id 4: %d \nN requests for road_id 5: %d \nN requests for road_id 6: %d", requests[1],requests[2],requests[3],requests[4],requests[5],requests[6]);
-                            printf("\n\nStatus for road_id 1: %d \nStatus for road_id 2: %d \nStatus for road_id 3: %d \nStatus for road_id 4: %d \nStatus for road_id 5: %d \nStatus for road_id 6: %d", statuses[0],statuses[1],statuses[2],statuses[3],statuses[4],statuses[5]);
-                            printf("\n\nCar sensor state for road_id 1: %d \nCar sensor state for road_id 2: %d \nCar sensor state for road_id 3: %d \nCar sensor state for road_id 4: %d \nCar sensor state for road_id 5: %d \nCar sensor state for road_id 6: %d", queue[0],queue[1],queue[2],queue[3],queue[4],queue[5]);
-                        }
+                        current_processed_road_id = next_road_id;
+                        n_requests_per_road[0] = 0;
+                        // atomic{
+                        //     printf("\n\n\n --- Global status --- ")
+                        //     printf("\n\nN n_requests_per_road for road_id 1: %d \nN n_requests_per_road for road_id 2: %d \nN n_requests_per_road for road_id 3: %d \nN n_requests_per_road for road_id 4: %d \nN n_requests_per_road for road_id 5: %d \nN n_requests_per_road for road_id 6: %d", n_requests_per_road[1],n_requests_per_road[2],n_requests_per_road[3],n_requests_per_road[4],n_requests_per_road[5],n_requests_per_road[6]);
+                        //     printf("\n\nStatus for road_id 1: %d \nStatus for road_id 2: %d \nStatus for road_id 3: %d \nStatus for road_id 4: %d \nStatus for road_id 5: %d \nStatus for road_id 6: %d", traffic_lights_states[0],traffic_lights_states[1],traffic_lights_states[2],traffic_lights_states[3],traffic_lights_states[4],traffic_lights_states[5]);
+                        //     printf("\n\nCar sensor state for road_id 1: %d \nCar sensor state for road_id 2: %d \nCar sensor state for road_id 3: %d \nCar sensor state for road_id 4: %d \nCar sensor state for road_id 5: %d \nCar sensor state for road_id 6: %d", road_sensor_state[0],road_sensor_state[1],road_sensor_state[2],road_sensor_state[3],road_sensor_state[4],road_sensor_state[5]);
+                        // }
                         fi
                 :: else ->
-                        printf("\n\n\nNo requests for road_id: %d", curr_road_id)
-                        requests[curr_road_id] = curr_road_id;
-                        currentTurn = next_road_id;
+                        printf("\n\n\nNo n_requests_per_road for road_id: %d", curr_road_id)
+                        n_requests_per_road[curr_road_id] = curr_road_id;
+                        current_processed_road_id = next_road_id;
                 fi;
             fi;
     od
@@ -160,25 +162,25 @@ init {
 }
 
 // Safety
-ltl s1 { [] ! (statuses[SN_ROAD_ID-1] && (statuses[EW_ROAD_ID-1] || statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
-ltl s2 { [] ! (statuses[EW_ROAD_ID-1] && (statuses[PED_ROAD_ID-1] || statuses[SN_ROAD_ID-1])) }
-ltl s3 { [] ! (statuses[SW_ROAD_ID-1] && (statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
-ltl s4 { [] ! (statuses[ES_ROAD_ID-1] && (statuses[PED_ROAD_ID-1] || statuses[SN_ROAD_ID-1] || statuses[SW_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
-ltl s5 { [] ! (statuses[WE_ROAD_ID-1] && (statuses[ES_ROAD_ID-1] || statuses[SW_ROAD_ID-1] || statuses[SN_ROAD_ID-1] || statuses[PED_ROAD_ID-1])) }
-ltl s6 { [] ! (statuses[PED_ROAD_ID-1] && (statuses[EW_ROAD_ID-1] || statuses[ES_ROAD_ID-1] || statuses[WE_ROAD_ID-1])) }
+ltl s1 { [] ! (traffic_lights_states[SN_ROAD_ID-1] && (traffic_lights_states[EW_ROAD_ID-1] || traffic_lights_states[ES_ROAD_ID-1] || traffic_lights_states[WE_ROAD_ID-1])) }
+ltl s2 { [] ! (traffic_lights_states[EW_ROAD_ID-1] && (traffic_lights_states[PED_ROAD_ID-1] || traffic_lights_states[SN_ROAD_ID-1])) }
+ltl s3 { [] ! (traffic_lights_states[SW_ROAD_ID-1] && (traffic_lights_states[ES_ROAD_ID-1] || traffic_lights_states[WE_ROAD_ID-1])) }
+ltl s4 { [] ! (traffic_lights_states[ES_ROAD_ID-1] && (traffic_lights_states[PED_ROAD_ID-1] || traffic_lights_states[SN_ROAD_ID-1] || traffic_lights_states[SW_ROAD_ID-1] || traffic_lights_states[WE_ROAD_ID-1])) }
+ltl s5 { [] ! (traffic_lights_states[WE_ROAD_ID-1] && (traffic_lights_states[ES_ROAD_ID-1] || traffic_lights_states[SW_ROAD_ID-1] || traffic_lights_states[SN_ROAD_ID-1] || traffic_lights_states[PED_ROAD_ID-1])) }
+ltl s6 { [] ! (traffic_lights_states[PED_ROAD_ID-1] && (traffic_lights_states[EW_ROAD_ID-1] || traffic_lights_states[ES_ROAD_ID-1] || traffic_lights_states[WE_ROAD_ID-1])) }
 
 // Liveness
-ltl l1 { []( (queue[SN_ROAD_ID-1] == 1 && statuses[SN_ROAD_ID-1]==false) -> <> (statuses[SN_ROAD_ID-1]==true) ) }
-ltl l2 { []( (queue[EW_ROAD_ID-1] == 1 && statuses[EW_ROAD_ID-1]==false) -> <> (statuses[EW_ROAD_ID-1]==true) ) }
-ltl l3 { []( (queue[SW_ROAD_ID-1] == 1 && statuses[SW_ROAD_ID-1]==false) -> <> (statuses[SW_ROAD_ID-1]==true) ) }
-ltl l4 { []( (queue[ES_ROAD_ID-1] == 1 && statuses[ES_ROAD_ID-1]==false) -> <> (statuses[ES_ROAD_ID-1]==true) ) }
-ltl l5 { []( (queue[WE_ROAD_ID-1] == 1 && statuses[WE_ROAD_ID-1]==false) -> <> (statuses[WE_ROAD_ID-1]==true) ) }
-ltl l6 { []( (queue[PED_ROAD_ID-1] == 1 && statuses[PED_ROAD_ID-1]==false) -> <> (statuses[PED_ROAD_ID-1]==true) ) }
+ltl l1 { []( (road_sensor_state[SN_ROAD_ID-1] == 1 && traffic_lights_states[SN_ROAD_ID-1]==false) -> <> (traffic_lights_states[SN_ROAD_ID-1]==true) ) }
+ltl l2 { []( (road_sensor_state[EW_ROAD_ID-1] == 1 && traffic_lights_states[EW_ROAD_ID-1]==false) -> <> (traffic_lights_states[EW_ROAD_ID-1]==true) ) }
+ltl l3 { []( (road_sensor_state[SW_ROAD_ID-1] == 1 && traffic_lights_states[SW_ROAD_ID-1]==false) -> <> (traffic_lights_states[SW_ROAD_ID-1]==true) ) }
+ltl l4 { []( (road_sensor_state[ES_ROAD_ID-1] == 1 && traffic_lights_states[ES_ROAD_ID-1]==false) -> <> (traffic_lights_states[ES_ROAD_ID-1]==true) ) }
+ltl l5 { []( (road_sensor_state[WE_ROAD_ID-1] == 1 && traffic_lights_states[WE_ROAD_ID-1]==false) -> <> (traffic_lights_states[WE_ROAD_ID-1]==true) ) }
+ltl l6 { []( (road_sensor_state[PED_ROAD_ID-1] == 1 && traffic_lights_states[PED_ROAD_ID-1]==false) -> <> (traffic_lights_states[PED_ROAD_ID-1]==true) ) }
 
 // Fairness
-ltl f1 { []( <> (statuses[SN_ROAD_ID-1] == false) ) }
-ltl f2 { []( <> (statuses[EW_ROAD_ID-1] == false) ) }
-ltl f3 { []( <> (statuses[SW_ROAD_ID-1] == false) ) }
-ltl f4 { []( <> (statuses[ES_ROAD_ID-1] == false) ) }
-ltl f5 { []( <> (statuses[WE_ROAD_ID-1] == false) ) }
-ltl f6 { []( <> (statuses[PED_ROAD_ID-1] == false) ) }
+ltl f1 { []( <> (traffic_lights_states[SN_ROAD_ID-1] == false) ) }
+ltl f2 { []( <> (traffic_lights_states[EW_ROAD_ID-1] == false) ) }
+ltl f3 { []( <> (traffic_lights_states[SW_ROAD_ID-1] == false) ) }
+ltl f4 { []( <> (traffic_lights_states[ES_ROAD_ID-1] == false) ) }
+ltl f5 { []( <> (traffic_lights_states[WE_ROAD_ID-1] == false) ) }
+ltl f6 { []( <> (traffic_lights_states[PED_ROAD_ID-1] == false) ) }
