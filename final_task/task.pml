@@ -18,7 +18,7 @@ byte n = 10;
 
 
 short n_requests_per_road [7] = {0,0,0,0,0,0};
-byte road_sensor_state [6] = {0,0,0,0,0,0};
+bool road_sensor_state[6] = {false, false, false, false, false, false};
 bool traffic_lights_states [6] = {false, false, false, false, false, false};
 
 
@@ -30,14 +30,13 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
     short competitor_2_value = 0;
     short competitor_3_value = 0;
     short competitor_4_value = 0;
-    byte temp = 0;
+    byte channel_data = 0;
     do
         :: current_processed_road_id == curr_road_id ->
         if
-        // Есть трафик для этого светофора
-        :: traffic_channel?temp->
+        :: traffic_channel?channel_data->
                 n_requests_per_road[0] = 0; 
-                road_sensor_state[curr_road_id-1] = temp;
+                road_sensor_state[curr_road_id-1] = (channel_data == 1);
 
                 atomic {
                     printf("\n\n\nProcess for road id: %d", curr_road_id);
@@ -66,7 +65,7 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
                             ->
                                 printf("\n\n\nOpen traffic light for road_id: %d", curr_road_id);
                                 traffic_lights_states[curr_road_id-1] = true;
-                                road_sensor_state[curr_road_id-1] = 0;
+                                road_sensor_state[curr_road_id-1] = false;
                                 current_processed_road_id = next_road_id
                         :: else ->
                                 printf("\n\n\nFailed to open traffic light for road_id: %d", curr_road_id);
@@ -110,7 +109,7 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
                                         printf("\n\n\n --- N n_requests_per_road status (AFTER CHECK, SUCCEEDED TO OPEN TRAFFIC LIGHT) --- ")
                                         printf("\n\nN n_requests_per_road for curr road_id %d: %d \nN n_requests_per_road for competitor_1 road_id %d: %d \nN n_requests_per_road for competitor_2 road_id %d: %d \nN n_requests_per_road for competitor_3 road_id %d: %d \nN n_requests_per_road for competitor_4 road_id %d: %d", curr_road_id, n_requests_per_road[curr_road_id], competitor_1, n_requests_per_road[competitor_1], competitor_2, n_requests_per_road[competitor_2], competitor_3, n_requests_per_road[competitor_3], competitor_4, n_requests_per_road[competitor_4]);
                                         traffic_lights_states[curr_road_id-1] = true;
-                                        road_sensor_state[curr_road_id-1] = 0;
+                                        road_sensor_state[curr_road_id-1] = false;
                                         n_requests_per_road[curr_road_id] = 999 + curr_road_id
                                 fi;
                         
@@ -150,12 +149,12 @@ proctype PedTrafficGenerator(){
 
 
 init {
-    run TrafficLight(SN_ROAD_ID, EW_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, SN_LIGHT_CHANNEL); /* S->N  ↔ E->W(2), E->S(4), W->E(5) */
-    run TrafficLight(EW_ROAD_ID, SW_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, 0, 0, EW_LIGHT_CHANNEL); /* E->W  ↔ Ped(6), S->N(1) */
-    run TrafficLight(SW_ROAD_ID, ES_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, 0, SW_LIGHT_CHANNEL); /* S->W  ↔ E->S(4), W->E(5) */
-    run TrafficLight(ES_ROAD_ID, WE_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, SW_ROAD_ID, WE_ROAD_ID, ES_LIGHT_CHANNEL); /* E->S  ↔ Ped(6), S->N(1), S->W(3), W->E(5) */
-    run TrafficLight(WE_ROAD_ID, PED_ROAD_ID, ES_ROAD_ID, SW_ROAD_ID, SN_ROAD_ID, PED_ROAD_ID, WE_LIGHT_CHANNEL); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
-    run TrafficLight(PED_ROAD_ID, SN_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, PED_LIGHT_CHANNEL); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(SN_ROAD_ID, EW_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, SN_LIGHT_CHANNEL); /* S->N: E->W(2), E->S(4), W->E(5) */
+    run TrafficLight(EW_ROAD_ID, SW_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, 0, 0, EW_LIGHT_CHANNEL); /* E->W: Ped(6), S->N(1) */
+    run TrafficLight(SW_ROAD_ID, ES_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, 0, SW_LIGHT_CHANNEL); /* S->W: E->S(4), W->E(5) */
+    run TrafficLight(ES_ROAD_ID, WE_ROAD_ID, PED_ROAD_ID, SN_ROAD_ID, SW_ROAD_ID, WE_ROAD_ID, ES_LIGHT_CHANNEL); /* E->S: Ped(6), S->N(1), S->W(3), W->E(5) */
+    run TrafficLight(WE_ROAD_ID, PED_ROAD_ID, ES_ROAD_ID, SW_ROAD_ID, SN_ROAD_ID, PED_ROAD_ID, WE_LIGHT_CHANNEL); /* W->E: E->S(4), S->W(3), S->N(1), Ped(6) */
+    run TrafficLight(PED_ROAD_ID, SN_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, PED_LIGHT_CHANNEL); /* Ped: E->W(2), E->S(4), W->E(5) */
 
     run CarTrafficGenerator();
     run PedTrafficGenerator();
@@ -170,12 +169,12 @@ ltl s5 { [] ! (traffic_lights_states[WE_ROAD_ID-1] && (traffic_lights_states[ES_
 ltl s6 { [] ! (traffic_lights_states[PED_ROAD_ID-1] && (traffic_lights_states[EW_ROAD_ID-1] || traffic_lights_states[ES_ROAD_ID-1] || traffic_lights_states[WE_ROAD_ID-1])) }
 
 // Liveness
-ltl l1 { []( (road_sensor_state[SN_ROAD_ID-1] == 1 && traffic_lights_states[SN_ROAD_ID-1]==false) -> <> (traffic_lights_states[SN_ROAD_ID-1]==true) ) }
-ltl l2 { []( (road_sensor_state[EW_ROAD_ID-1] == 1 && traffic_lights_states[EW_ROAD_ID-1]==false) -> <> (traffic_lights_states[EW_ROAD_ID-1]==true) ) }
-ltl l3 { []( (road_sensor_state[SW_ROAD_ID-1] == 1 && traffic_lights_states[SW_ROAD_ID-1]==false) -> <> (traffic_lights_states[SW_ROAD_ID-1]==true) ) }
-ltl l4 { []( (road_sensor_state[ES_ROAD_ID-1] == 1 && traffic_lights_states[ES_ROAD_ID-1]==false) -> <> (traffic_lights_states[ES_ROAD_ID-1]==true) ) }
-ltl l5 { []( (road_sensor_state[WE_ROAD_ID-1] == 1 && traffic_lights_states[WE_ROAD_ID-1]==false) -> <> (traffic_lights_states[WE_ROAD_ID-1]==true) ) }
-ltl l6 { []( (road_sensor_state[PED_ROAD_ID-1] == 1 && traffic_lights_states[PED_ROAD_ID-1]==false) -> <> (traffic_lights_states[PED_ROAD_ID-1]==true) ) }
+ltl l1 { []( (road_sensor_state[SN_ROAD_ID-1] == true && traffic_lights_states[SN_ROAD_ID-1]==false) -> <> (traffic_lights_states[SN_ROAD_ID-1]==true) ) }
+ltl l2 { []( (road_sensor_state[EW_ROAD_ID-1] == true && traffic_lights_states[EW_ROAD_ID-1]==false) -> <> (traffic_lights_states[EW_ROAD_ID-1]==true) ) }
+ltl l3 { []( (road_sensor_state[SW_ROAD_ID-1] == true && traffic_lights_states[SW_ROAD_ID-1]==false) -> <> (traffic_lights_states[SW_ROAD_ID-1]==true) ) }
+ltl l4 { []( (road_sensor_state[ES_ROAD_ID-1] == true && traffic_lights_states[ES_ROAD_ID-1]==false) -> <> (traffic_lights_states[ES_ROAD_ID-1]==true) ) }
+ltl l5 { []( (road_sensor_state[WE_ROAD_ID-1] == true && traffic_lights_states[WE_ROAD_ID-1]==false) -> <> (traffic_lights_states[WE_ROAD_ID-1]==true) ) }
+ltl l6 { []( (road_sensor_state[PED_ROAD_ID-1] == true && traffic_lights_states[PED_ROAD_ID-1]==false) -> <> (traffic_lights_states[PED_ROAD_ID-1]==true) ) }
 
 // Fairness
 ltl f1 { []( <> (traffic_lights_states[SN_ROAD_ID-1] == false) ) }
