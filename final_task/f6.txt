@@ -1,0 +1,56 @@
+pan: ltl formula f6
+Depth=  160871 States=    1e+06 Transitions= 5.11e+06 Memory=   307.090 t=     2.95 R=   3e+05
+Depth=  600607 States=    2e+06 Transitions= 1.09e+07 Memory=   492.050 t=     6.31 R=   3e+05
+Depth=  600607 States=    3e+06 Transitions= 1.72e+07 Memory=   709.824 t=     10.2 R=   3e+05
+Depth=  600607 States=    4e+06 Transitions= 2.36e+07 Memory=   930.722 t=     14.3 R=   3e+05
+Depth=  600607 States=    5e+06 Transitions= 3.01e+07 Memory=  1124.277 t=     18.2 R=   3e+05
+
+(Spin Version 6.5.1 -- 20 December 2019)
+        + Partial Order Reduction
+
+Full statespace search for:
+        never claim             + (f6)
+        assertion violations    + (if within scope of claim)
+        acceptance   cycles     + (fairness disabled)
+        invalid end states      - (disabled by never claim)
+
+State-vector 284 byte, depth reached 600607, errors: 0
+  4627985 states, stored (5.51598e+06 visited)
+ 27220792 states, matched
+ 32736773 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:   3110778 (resolved)
+
+Stats on memory usage (in Megabytes):
+ 1377.040       equivalent memory usage for states (stored*(State-vector + overhead))
+ 1062.754       actual memory usage for states (compression: 77.18%)
+                state-vector as stored = 213 byte + 28 byte overhead
+  128.000       memory used for hash table (-w24)
+   53.406       memory used for DFS stack (-m1000000)
+    1.719       memory lost to fragmentation
+ 1242.441       total actual memory usage
+
+
+unreached in proctype CarTrafficGenerator
+        task.pml:36, state 9, "-end-"
+        (1 of 9 states)
+unreached in proctype PedTrafficGenerator
+        task.pml:42, state 5, "-end-"
+        (1 of 5 states)
+unreached in proctype TrafficLight
+        task.pml:83, state 22, "printf('\n\n\nOpen traffic light for road_id: %d',curr_road_id)"
+        task.pml:84, state 23, "traffic_lights_states[curr_road_id] = 1"
+        task.pml:85, state 24, "road_sensor_state[curr_road_id] = 0"
+        task.pml:86, state 25, "current_processed_road_id = next_road_id"
+        task.pml:91, state 31, "competitor_1_value = 0"
+        task.pml:95, state 37, "competitor_2_value = 0"
+        task.pml:149, state 88, "-end-"
+        (7 of 88 states)
+unreached in init
+        (0 of 9 states)
+unreached in claim f6
+        _spin_nvr.tmp:185, state 13, "-end-"
+        (1 of 13 states)
+
+pan: elapsed time 19.8 seconds
+pan: rate 279007.64 states/second

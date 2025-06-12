@@ -1,0 +1,60 @@
+pan: ltl formula l1
+Depth=    1280 States=    1e+06 Transitions= 5.42e+06 Memory=   296.250 t=     2.55 R=   4e+05
+Depth=    4736 States=    2e+06 Transitions= 1.08e+07 Memory=   411.093 t=     5.39 R=   4e+05
+Depth=    4736 States=    3e+06 Transitions= 1.63e+07 Memory=   525.644 t=     8.09 R=   4e+05
+Depth=    4736 States=    4e+06 Transitions= 2.18e+07 Memory=   640.195 t=       11 R=   4e+05
+Depth=    6110 States=    5e+06 Transitions= 2.73e+07 Memory=   754.941 t=     13.6 R=   4e+05
+Depth=  439953 States=    6e+06 Transitions= 3.25e+07 Memory=   905.820 t=     16.4 R=   4e+05
+Depth=  600607 States=    7e+06 Transitions= 4.07e+07 Memory=  1120.859 t=     21.1 R=   3e+05
+Depth=  600607 States=    8e+06 Transitions= 5.09e+07 Memory=  1350.156 t=     27.5 R=   3e+05
+Depth=  600607 States=    9e+06 Transitions= 5.92e+07 Memory=  1564.121 t=     32.5 R=   3e+05
+
+(Spin Version 6.5.1 -- 20 December 2019)
+        + Partial Order Reduction
+
+Full statespace search for:
+        never claim             + (l1)
+        assertion violations    + (if within scope of claim)
+        acceptance   cycles     + (fairness disabled)
+        invalid end states      - (disabled by never claim)
+
+State-vector 284 byte, depth reached 600607, errors: 0
+  6712468 states, stored (9.68495e+06 visited)
+ 55800201 states, matched
+ 65485148 transitions (= visited+matched)
+        0 atomic steps
+hash conflicts:   8298001 (resolved)
+
+Stats on memory usage (in Megabytes):
+ 1997.271       equivalent memory usage for states (stored*(State-vector + overhead))
+ 1541.333       actual memory usage for states (compression: 77.17%)
+                state-vector as stored = 213 byte + 28 byte overhead
+  128.000       memory used for hash table (-w24)
+   53.406       memory used for DFS stack (-m1000000)
+    2.465       memory lost to fragmentation
+ 1720.273       total actual memory usage
+
+
+unreached in proctype CarTrafficGenerator
+        task.pml:36, state 9, "-end-"
+        (1 of 9 states)
+unreached in proctype PedTrafficGenerator
+        task.pml:42, state 5, "-end-"
+        (1 of 5 states)
+unreached in proctype TrafficLight
+        task.pml:83, state 22, "printf('\n\n\nOpen traffic light for road_id: %d',curr_road_id)"
+        task.pml:84, state 23, "traffic_lights_states[curr_road_id] = 1"
+        task.pml:85, state 24, "road_sensor_state[curr_road_id] = 0"
+        task.pml:86, state 25, "current_processed_road_id = next_road_id"
+        task.pml:91, state 31, "competitor_1_value = 0"
+        task.pml:95, state 37, "competitor_2_value = 0"
+        task.pml:149, state 88, "-end-"
+        (7 of 88 states)
+unreached in init
+        (0 of 9 states)
+unreached in claim l1
+        _spin_nvr.tmp:64, state 13, "-end-"
+        (1 of 13 states)
+
+pan: elapsed time 35.9 seconds
+pan: rate 269625.47 states/second
