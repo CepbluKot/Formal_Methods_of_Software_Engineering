@@ -14,7 +14,7 @@ chan ES_LIGHT_CHANNEL = [1] of {byte};
 chan WE_LIGHT_CHANNEL = [1] of {byte};
 chan PED_LIGHT_CHANNEL = [1] of {byte};
 
-byte n = 10;
+byte priority_coef = 10;
 
 
 short n_requests_per_road [7] = {0,0,0,0,0,0};
@@ -23,6 +23,23 @@ bool traffic_lights_states [6] = {false, false, false, false, false, false};
 
 
 byte current_processed_road_id = 1;
+
+
+proctype CarTrafficGenerator(){
+    do
+        :: SN_LIGHT_CHANNEL!1
+        :: EW_LIGHT_CHANNEL!1
+        :: SW_LIGHT_CHANNEL!1
+        :: ES_LIGHT_CHANNEL!1
+        :: WE_LIGHT_CHANNEL!1
+    od
+}
+
+proctype PedTrafficGenerator(){
+    do
+        :: PED_LIGHT_CHANNEL!1
+    od
+}
 
 proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; byte competitor_2; byte competitor_3; byte competitor_4; chan traffic_channel){
     short curr_road_value = 0;
@@ -96,11 +113,11 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
 
                                 if 
                                     :: competitor_1_value > curr_road_value || competitor_2_value > curr_road_value || competitor_3_value > curr_road_value ->
-                                        n_requests_per_road[curr_road_id] = curr_road_value + n; 
-                                        n_requests_per_road[competitor_1] = competitor_1_value + n;
-                                        n_requests_per_road[competitor_2] = competitor_2_value + n;
-                                        n_requests_per_road[competitor_3] = competitor_3_value + n;
-                                        n_requests_per_road[competitor_4] = competitor_4_value + n;
+                                        n_requests_per_road[curr_road_id] = curr_road_value + priority_coef; 
+                                        n_requests_per_road[competitor_1] = competitor_1_value + priority_coef;
+                                        n_requests_per_road[competitor_2] = competitor_2_value + priority_coef;
+                                        n_requests_per_road[competitor_3] = competitor_3_value + priority_coef;
+                                        n_requests_per_road[competitor_4] = competitor_4_value + priority_coef;
                                         
                                         printf("\n\n\n --- N n_requests_per_road status (AFTER CHECK, FAILED TO OPEN TRAFFIC LIGHT) --- ")
                                         printf("\n\nN n_requests_per_road for curr road_id %d: %d \nN n_requests_per_road for competitor_1 road_id %d: %d \nN n_requests_per_road for competitor_2 road_id %d: %d \nN n_requests_per_road for competitor_3 road_id %d: %d \nN n_requests_per_road for competitor_4 road_id %d: %d", curr_road_id, n_requests_per_road[curr_road_id], competitor_1, n_requests_per_road[competitor_1], competitor_2, n_requests_per_road[competitor_2], competitor_3, n_requests_per_road[competitor_3], competitor_4, n_requests_per_road[competitor_4]);
@@ -128,22 +145,6 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
                         current_processed_road_id = next_road_id;
                 fi;
             fi;
-    od
-}
-
-proctype CarTrafficGenerator(){
-    do
-        :: SN_LIGHT_CHANNEL!1
-        :: EW_LIGHT_CHANNEL!1
-        :: SW_LIGHT_CHANNEL!1
-        :: ES_LIGHT_CHANNEL!1
-        :: WE_LIGHT_CHANNEL!1
-    od
-}
-
-proctype PedTrafficGenerator(){
-    do
-        :: PED_LIGHT_CHANNEL!1
     od
 }
 
