@@ -135,13 +135,18 @@ proctype TrafficLight (byte curr_road_id; byte next_road_id; byte competitor_1; 
     od
 }
 
-proctype TrafficGenerator(){
+proctype CarTrafficGenerator(){
     do
         :: SN_LIGHT_CHANNEL!1
         :: EW_LIGHT_CHANNEL!1
         :: SW_LIGHT_CHANNEL!1
         :: ES_LIGHT_CHANNEL!1
         :: WE_LIGHT_CHANNEL!1
+    od
+}
+
+proctype PedTrafficGenerator(){
+    do
         :: PED_LIGHT_CHANNEL!1
     od
 }
@@ -158,7 +163,8 @@ init {
     run TrafficLight(WE_ROAD_ID, PED_ROAD_ID, ES_ROAD_ID, SW_ROAD_ID, SN_ROAD_ID, PED_ROAD_ID, WE_LIGHT_CHANNEL); /* W->E  ↔ E->S(4), S->W(3), S->N(1), Ped(6) */
     run TrafficLight(PED_ROAD_ID, SN_ROAD_ID, EW_ROAD_ID, ES_ROAD_ID, WE_ROAD_ID, 0, PED_LIGHT_CHANNEL); /* Ped   ↔ E->W(2), E->S(4), W->E(5) */
 
-    run TrafficGenerator();
+    run CarTrafficGenerator();
+    run PedTrafficGenerator();
 }
 
 
