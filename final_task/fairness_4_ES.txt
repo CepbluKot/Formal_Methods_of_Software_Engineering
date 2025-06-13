@@ -1,18 +1,18 @@
-pan: ltl formula f4
-Depth=  249243 States=    1e+06 Transitions= 4.75e+06 Memory=   314.218 t=     2.79 R=   4e+05
-Depth=  600607 States=    2e+06 Transitions= 9.92e+06 Memory=   516.757 t=     6.24 R=   3e+05
-Depth=  600607 States=    3e+06 Transitions= 1.62e+07 Memory=   730.527 t=     10.2 R=   3e+05
-Depth=  600607 States=    4e+06 Transitions= 2.25e+07 Memory=   953.867 t=     14.2 R=   3e+05
-Depth=  600607 States=    5e+06 Transitions= 2.89e+07 Memory=  1155.332 t=     18.5 R=   3e+05
+pan: ltl formula fairness_4_ES
+Depth=  249243 States=    1e+06 Transitions= 4.75e+06 Memory=   314.218	t=     2.56 R=   4e+05
+Depth=  600607 States=    2e+06 Transitions= 9.92e+06 Memory=   516.757	t=     5.59 R=   4e+05
+Depth=  600607 States=    3e+06 Transitions= 1.62e+07 Memory=   730.527	t=     9.38 R=   3e+05
+Depth=  600607 States=    4e+06 Transitions= 2.25e+07 Memory=   953.867	t=     13.2 R=   3e+05
+Depth=  600607 States=    5e+06 Transitions= 2.89e+07 Memory=  1155.332	t=     17.1 R=   3e+05
 
 (Spin Version 6.5.1 -- 20 December 2019)
-        + Partial Order Reduction
+	+ Partial Order Reduction
 
 Full statespace search for:
-        never claim             + (f4)
-        assertion violations    + (if within scope of claim)
-        acceptance   cycles     + (fairness disabled)
-        invalid end states      - (disabled by never claim)
+	never claim         	+ (fairness_4_ES)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
 
 State-vector 284 byte, depth reached 600607, errors: 0
   4664912 states, stored (5.58984e+06 visited)
@@ -22,35 +22,57 @@ State-vector 284 byte, depth reached 600607, errors: 0
 hash conflicts:   3175823 (resolved)
 
 Stats on memory usage (in Megabytes):
- 1388.028       equivalent memory usage for states (stored*(State-vector + overhead))
- 1071.263       actual memory usage for states (compression: 77.18%)
-                state-vector as stored = 213 byte + 28 byte overhead
-  128.000       memory used for hash table (-w24)
-   53.406       memory used for DFS stack (-m1000000)
-    1.732       memory lost to fragmentation
- 1250.937       total actual memory usage
+ 1388.028	equivalent memory usage for states (stored*(State-vector + overhead))
+ 1071.263	actual memory usage for states (compression: 77.18%)
+         	state-vector as stored = 213 byte + 28 byte overhead
+  128.000	memory used for hash table (-w24)
+   53.406	memory used for DFS stack (-m1000000)
+    1.732	memory lost to fragmentation
+ 1250.937	total actual memory usage
 
 
 unreached in proctype CarTrafficGenerator
-        task.pml:36, state 9, "-end-"
-        (1 of 9 states)
+	task.pml:36, state 9, "-end-"
+	(1 of 9 states)
 unreached in proctype PedTrafficGenerator
-        task.pml:42, state 5, "-end-"
-        (1 of 5 states)
+	task.pml:42, state 5, "-end-"
+	(1 of 5 states)
 unreached in proctype TrafficLight
-        task.pml:83, state 22, "printf('\n\n\nOpen traffic light for road_id: %d',curr_road_id)"
-        task.pml:84, state 23, "traffic_lights_states[curr_road_id] = 1"
-        task.pml:85, state 24, "road_sensor_state[curr_road_id] = 0"
-        task.pml:86, state 25, "current_processed_road_id = next_road_id"
-        task.pml:91, state 31, "competitor_1_value = 0"
-        task.pml:95, state 37, "competitor_2_value = 0"
-        task.pml:149, state 88, "-end-"
-        (7 of 88 states)
+	task.pml:83, state 22, "printf('\n\n\nOpen traffic light for road_id: %d',curr_road_id)"
+	task.pml:84, state 23, "traffic_lights_states[curr_road_id] = 1"
+	task.pml:85, state 24, "road_sensor_state[curr_road_id] = 0"
+	task.pml:86, state 25, "current_processed_road_id = next_road_id"
+	task.pml:91, state 31, "competitor_1_value = 0"
+	task.pml:95, state 37, "competitor_2_value = 0"
+	task.pml:149, state 88, "-end-"
+	(7 of 88 states)
 unreached in init
-        (0 of 9 states)
-unreached in claim f4
-        _spin_nvr.tmp:163, state 13, "-end-"
-        (1 of 13 states)
+	(0 of 9 states)
+unreached in claim fairness_4_ES
+	_spin_nvr.tmp:163, state 13, "-end-"
+	(1 of 13 states)
 
-pan: elapsed time 21.1 seconds
-pan: rate  265046.7 states/second
+pan: elapsed time 19.4 seconds
+pan: rate 288582.09 states/second
+ltl safety_1_SN: [] (! ((traffic_lights_states[1]) && (((traffic_lights_states[2]) || (traffic_lights_states[4])) || (traffic_lights_states[5]))))
+ltl safety_2_EW: [] (! ((traffic_lights_states[2]) && ((traffic_lights_states[6]) || (traffic_lights_states[1]))))
+ltl safety_3_SW: [] (! ((traffic_lights_states[3]) && ((traffic_lights_states[4]) || (traffic_lights_states[5]))))
+ltl safety_4_ES: [] (! ((traffic_lights_states[4]) && ((((traffic_lights_states[6]) || (traffic_lights_states[1])) || (traffic_lights_states[3])) || (traffic_lights_states[5]))))
+ltl safety_5_WE: [] (! ((traffic_lights_states[5]) && ((((traffic_lights_states[4]) || (traffic_lights_states[3])) || (traffic_lights_states[1])) || (traffic_lights_states[6]))))
+ltl safety_6_PED: [] (! ((traffic_lights_states[6]) && (((traffic_lights_states[2]) || (traffic_lights_states[4])) || (traffic_lights_states[5]))))
+ltl liveness_1_SN: [] ((! (((road_sensor_state[1]==1)) && ((traffic_lights_states[1]==0)))) || (<> ((traffic_lights_states[1]==1))))
+ltl liveness_2_EW: [] ((! (((road_sensor_state[2]==1)) && ((traffic_lights_states[2]==0)))) || (<> ((traffic_lights_states[2]==1))))
+ltl liveness_3_SW: [] ((! (((road_sensor_state[3]==1)) && ((traffic_lights_states[3]==0)))) || (<> ((traffic_lights_states[3]==1))))
+ltl liveness_4_ES: [] ((! (((road_sensor_state[4]==1)) && ((traffic_lights_states[4]==0)))) || (<> ((traffic_lights_states[4]==1))))
+ltl liveness_5_WE: [] ((! (((road_sensor_state[5]==1)) && ((traffic_lights_states[5]==0)))) || (<> ((traffic_lights_states[5]==1))))
+ltl liveness_6_PED: [] ((! (((road_sensor_state[6]==1)) && ((traffic_lights_states[6]==0)))) || (<> ((traffic_lights_states[6]==1))))
+ltl fairness_1_SN: [] (<> ((traffic_lights_states[1]==0)))
+ltl fairness_2_EW: [] (<> ((traffic_lights_states[2]==0)))
+ltl fairness_3_SW: [] (<> ((traffic_lights_states[3]==0)))
+ltl fairness_4_ES: [] (<> ((traffic_lights_states[4]==0)))
+ltl fairness_5_WE: [] (<> ((traffic_lights_states[5]==0)))
+ltl fairness_6_PED: [] (<> ((traffic_lights_states[6]==0)))
+  the model contains 18 never claims: fairness_6_PED, fairness_5_WE, fairness_4_ES, fairness_3_SW, fairness_2_EW, fairness_1_SN, liveness_6_PED, liveness_5_WE, liveness_4_ES, liveness_3_SW, liveness_2_EW, liveness_1_SN, safety_6_PED, safety_5_WE, safety_4_ES, safety_3_SW, safety_2_EW, safety_1_SN
+  only one claim is used in a verification run
+  choose which one with ./pan -a -N name (defaults to -N safety_1_SN)
+  or use e.g.: spin -search -ltl safety_1_SN task.pml
