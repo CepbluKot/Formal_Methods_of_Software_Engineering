@@ -17,7 +17,7 @@ chan PED_LIGHT_CHANNEL = [1] of {byte};
 byte priority_coef = 10;
 
 
-short n_requests_per_road [7] = {0,0,0,0,0,0};
+short n_requests_per_road [7] = {0,0,0,0,0,0,0};
 bool road_sensor_state[7] = {false, false, false, false, false, false, false};
 bool traffic_lights_states [7] = {false, false, false, false, false, false, false};
 
