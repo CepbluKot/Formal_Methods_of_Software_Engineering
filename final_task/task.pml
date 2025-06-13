@@ -162,25 +162,25 @@ init {
 }
 
 // Safety
-ltl s1 { [] ! (traffic_lights_states[SN_ROAD_ID] && (traffic_lights_states[EW_ROAD_ID] || traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) }
-ltl s2 { [] ! (traffic_lights_states[EW_ROAD_ID] && (traffic_lights_states[PED_ROAD_ID] || traffic_lights_states[SN_ROAD_ID])) }
-ltl s3 { [] ! (traffic_lights_states[SW_ROAD_ID] && (traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) }
-ltl s4 { [] ! (traffic_lights_states[ES_ROAD_ID] && (traffic_lights_states[PED_ROAD_ID] || traffic_lights_states[SN_ROAD_ID] || traffic_lights_states[SW_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) }
-ltl s5 { [] ! (traffic_lights_states[WE_ROAD_ID] && (traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[SW_ROAD_ID] || traffic_lights_states[SN_ROAD_ID] || traffic_lights_states[PED_ROAD_ID])) }
-ltl s6 { [] ! (traffic_lights_states[PED_ROAD_ID] && (traffic_lights_states[EW_ROAD_ID] || traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) }
+ltl s1 { [] ! (traffic_lights_states[SN_ROAD_ID] && (traffic_lights_states[EW_ROAD_ID] || traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) } /* 1: S->N and (E->W, E->S, W->E) */
+ltl s2 { [] ! (traffic_lights_states[EW_ROAD_ID] && (traffic_lights_states[PED_ROAD_ID] || traffic_lights_states[SN_ROAD_ID])) } /* 2: E->W and (Ped, S->N) */
+ltl s3 { [] ! (traffic_lights_states[SW_ROAD_ID] && (traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) } /* 3: S->W and (E->S, W->E) */
+ltl s4 { [] ! (traffic_lights_states[ES_ROAD_ID] && (traffic_lights_states[PED_ROAD_ID] || traffic_lights_states[SN_ROAD_ID] || traffic_lights_states[SW_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) } /* 4: E->S and (Ped, S->N, S->W, W->E) */
+ltl s5 { [] ! (traffic_lights_states[WE_ROAD_ID] && (traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[SW_ROAD_ID] || traffic_lights_states[SN_ROAD_ID] || traffic_lights_states[PED_ROAD_ID])) } /* 5: W->E and (E->S, S->W, S->N, Ped) */
+ltl s6 { [] ! (traffic_lights_states[PED_ROAD_ID] && (traffic_lights_states[EW_ROAD_ID] || traffic_lights_states[ES_ROAD_ID] || traffic_lights_states[WE_ROAD_ID])) } /* 6: Ped and (E->W, E->S, W->E) */
 
 // Liveness
-ltl l1 { []( (road_sensor_state[SN_ROAD_ID] == true && traffic_lights_states[SN_ROAD_ID]==false) -> <> (traffic_lights_states[SN_ROAD_ID]==true) ) }
-ltl l2 { []( (road_sensor_state[EW_ROAD_ID] == true && traffic_lights_states[EW_ROAD_ID]==false) -> <> (traffic_lights_states[EW_ROAD_ID]==true) ) }
-ltl l3 { []( (road_sensor_state[SW_ROAD_ID] == true && traffic_lights_states[SW_ROAD_ID]==false) -> <> (traffic_lights_states[SW_ROAD_ID]==true) ) }
-ltl l4 { []( (road_sensor_state[ES_ROAD_ID] == true && traffic_lights_states[ES_ROAD_ID]==false) -> <> (traffic_lights_states[ES_ROAD_ID]==true) ) }
-ltl l5 { []( (road_sensor_state[WE_ROAD_ID] == true && traffic_lights_states[WE_ROAD_ID]==false) -> <> (traffic_lights_states[WE_ROAD_ID]==true) ) }
-ltl l6 { []( (road_sensor_state[PED_ROAD_ID] == true && traffic_lights_states[PED_ROAD_ID]==false) -> <> (traffic_lights_states[PED_ROAD_ID]==true) ) }
+ltl l1 { []( (road_sensor_state[SN_ROAD_ID] == true && traffic_lights_states[SN_ROAD_ID]==false) -> <> (traffic_lights_states[SN_ROAD_ID]==true) ) } /* for SN road */
+ltl l2 { []( (road_sensor_state[EW_ROAD_ID] == true && traffic_lights_states[EW_ROAD_ID]==false) -> <> (traffic_lights_states[EW_ROAD_ID]==true) ) } /* for EW road */
+ltl l3 { []( (road_sensor_state[SW_ROAD_ID] == true && traffic_lights_states[SW_ROAD_ID]==false) -> <> (traffic_lights_states[SW_ROAD_ID]==true) ) } /* for SW road */
+ltl l4 { []( (road_sensor_state[ES_ROAD_ID] == true && traffic_lights_states[ES_ROAD_ID]==false) -> <> (traffic_lights_states[ES_ROAD_ID]==true) ) } /* for ES road */
+ltl l5 { []( (road_sensor_state[WE_ROAD_ID] == true && traffic_lights_states[WE_ROAD_ID]==false) -> <> (traffic_lights_states[WE_ROAD_ID]==true) ) } /* for WE road */
+ltl l6 { []( (road_sensor_state[PED_ROAD_ID] == true && traffic_lights_states[PED_ROAD_ID]==false) -> <> (traffic_lights_states[PED_ROAD_ID]==true) ) } /* for PED road */
 
 // Fairness
-ltl f1 { []( <> (traffic_lights_states[SN_ROAD_ID] == false) ) }
-ltl f2 { []( <> (traffic_lights_states[EW_ROAD_ID] == false) ) }
-ltl f3 { []( <> (traffic_lights_states[SW_ROAD_ID] == false) ) }
-ltl f4 { []( <> (traffic_lights_states[ES_ROAD_ID] == false) ) }
-ltl f5 { []( <> (traffic_lights_states[WE_ROAD_ID] == false) ) }
-ltl f6 { []( <> (traffic_lights_states[PED_ROAD_ID] == false) ) }
+ltl f1 { []( <> (traffic_lights_states[SN_ROAD_ID] == false) ) }  /* for SN road */
+ltl f2 { []( <> (traffic_lights_states[EW_ROAD_ID] == false) ) }  /* for EW road */
+ltl f3 { []( <> (traffic_lights_states[SW_ROAD_ID] == false) ) }  /* for SW road */
+ltl f4 { []( <> (traffic_lights_states[ES_ROAD_ID] == false) ) }  /* for ES road */
+ltl f5 { []( <> (traffic_lights_states[WE_ROAD_ID] == false) ) }  /* for WE road */
+ltl f6 { []( <> (traffic_lights_states[PED_ROAD_ID] == false) ) } /* for PED road */
